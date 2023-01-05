@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .card{
+            border: 1px solid black;
+        }
+        .cyan{
+            background-color: cyan;
+        }
+        .wheat{
+            background-color: wheat;
+        }
+        .imgwh{
+            width: 80px;
+            height: 80px;
+        }
+        .color-white{
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- can use v-showf -->
+        {{message}}
+        <!-- vue loop => v-for="" :key=""  the syntax of ':' is v-bind -->
+        <div class="new-person">
+            <div class="name">
+                <div>
+                    <label for="add-name">new name</label>
+                    <input type="text" id="add-name">
+                </div>
+                <div>
+                    <label for="add-age">new age</label>
+                    <input type="number" id="add-age">
+                </div>
+                <div>
+                    <label for="add-gender">gender</label>
+                    <select name="gender" id="add-gender">
+                        <option value="male">male</option>
+                        <option value="female">female</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="add-keysnumber">how many keys</label>
+                    <input type="text" id="add-keysnumber">
+                </div>
+            </div>
+            <button @click="addPerson()" type="button">add person</button>
+            <button @click="checkRecord()" type="button">check record</button>
+            <button @click="recover()" type="button" >recover</button>
+        </div>
+        
+        <div v-for="(item,index) in person" :key="index" class="card" :class="{ 'wheat color-white': index % 2 == 0, 'cyan': index % 2 == 1 }">
+            <div class="name">
+                {{ item.name }}
+                <span v-if="item.editing"><input v-model="emptyPerson.name" type="text"></span>
+            </div>
+            <div class="age">
+                {{ item.age }}
+                <span v-if="item.editing"><input v-model="emptyPerson.age" type="number"></span>
+            </div>
+            <div>
+                {{ item.gender }}
+                <span v-if="item.editing">
+                    <select name="gender" id="" v-model="emptyPerson.gender">
+                        <option value="male">male</option>
+                        <option value="female">female</option>
+                    </select>
+                </span>
+            </div>
+            <div class="keys">
+                有幾把鑰匙：{{ item.keysnumber }}
+                <span v-if="item.editing"><input v-model="emptyPerson.keysnumber" type="number"></span>
+            </div>
+            <button @click="item.keysnumber++" type="button">生產鑰匙</button>
+            <button @click="deletePerson(index)" type="button">新細明體 你屎了 ㄍㄌㄇㄉ</button>
+            <button @click="editPerson(index);" type="button">edit</button>
+            <!-- v-model only for input -->
+            <input v-model="item.keysnumber" type="number">
+            <img class="imgwh" v-if="item.gender == 'male' ":src="image.male" alt="">
+            <img class="imgwh" v-else :src="image.female" alt="">
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            //place where variable be placed.
+            data() {
+                return {
+                    message: 'Hello Vue!',
+                    person: [
+                        {
+                            name : '大中天',
+                            age : 18 ,
+                            gender : 'male',
+                            keysnumber : 0 ,
+                            editing : false,
+                        },{
+                            name : '魯凱',
+                            age : 20 ,
+                            gender : 'male',
+                            keysnumber : 0 ,
+                            editing : false,
+                        },{
+                            name : '凌娜',
+                            age : 17 ,
+                            gender : 'female',
+                            keysnumber : 10 ,
+                            editing : false,
+                        },{
+                            name : '薩提斯',
+                            age : 58 ,
+                            gender : 'male',
+                            keysnumber : 0 ,
+                            editing : false,
+                        },
+                    ],
+                    image: {
+                        male : './img/gashu4.jpg',
+                        female : './img/splatoon4.jpg',
+                    },
+                    record: [
+                    ],
+                    tempPerson: {
+                        name : '',
+                        age : 0 ,
+                        gender : 'male',
+                        keysnumber : 0 ,
+                        editing : false,
+                    },
+                    emptyPerson: {
+                        name : '',
+                        age : 0 ,
+                        gender : 'male',
+                        keysnumber : 0 ,
+                        editing : false,
+                    },
+                }
+            },
+            // notice: watch: , handler , immediate , deep
+            // place functions
+            methods: {
+                // add new person data in array person.
+                addPerson(){
+                    let name = document.querySelector('#add-name');
+                    let age = document.querySelector('#add-age');
+                    let gender = document.querySelector('#add-gender');
+                    let keysnumber = document.querySelector('#add-keysnumber');
+
+                    let errorkey = false ;
+                    let errormessage = 'please fill ';
+                    if (name.value == '') {
+                        errorkey = true ;
+                        errormessage += 'name ';
+                    };
+
+                    if (age.value == '') {
+                        errorkey = true ;
+                        errormessage += 'age ';
+                    };
+
+                    if (gender.value != 'male' && gender.value != 'female') {
+                        errorkey = true ;
+                        errormessage += 'gender ';
+                    };
+
+                    if ( keysnumber.value == '') {
+                        errorkey = true ;
+                        errormessage += 'keys ';
+                    };
+
+                    errormessage += 'columns.';
+
+                    if (errorkey) {
+                        this.message = errormessage;
+                        return;
+                    }
+
+                    let p = {
+                        name : name.value,
+                        age : Number(age.value),
+                        gender : gender.value,
+                        keysnumber : Number(keysnumber.value),
+                        isEdit : false ,
+                    };
+
+                    // console.log(p);
+                    let action = {
+                        action : 'add',
+                    };
+                    this.record.push(action);
+                    this.person.push(p);
+                    name.value = '';
+                    age.value = '';
+                    gender.value = 'male';
+                    keysnumber.value = '';
+                    return;
+                },
+                deletePerson(index){
+                    let action = {
+                        action : 'delete',
+                        index : index ,
+                        object : this.person[index],
+                    };
+                    this.record.push(action);
+                    this.person.splice(index,1);
+                    this.message = 'delete success.'
+                },
+                checkRecord(){
+                    console.log(this.record);
+                },
+                recover(){
+                    if ( this.record.length < 1 ){
+                        console.log('ㄍㄌㄇㄉ');
+                        this.message = 'nothing recovered.'
+                        return ;
+                    };
+                    if ( this.record[ this.record.length - 1 ].action == 'delete' ) {
+                        console.log('success recover delete');
+                        this.person.splice( this.record[ this.record.length - 1 ].index , 0 , this.record[ this.record.length - 1 ].object );
+                        this.record.splice( this.record.length - 1, 1 );
+                    }
+                    else if (this.record[ this.record.length - 1 ].action == 'edit') {
+                        console.log('success recover edit');
+                        this.person[this.record[ this.record.length - 1 ].index] = {...this.record[ this.record.length - 1 ].object};
+                        this.record.splice( this.record.length - 1, 1 );
+                    }
+                    else if (this.record[ this.record.length - 1 ].action == 'add') {
+                        this.person.splice( this.person.length - 1, 1 );
+                        this.record.splice( this.record.length - 1, 1 );
+                    };
+                    this.message = 'recover success.';
+                    return;
+                },
+                editPerson(index){
+                    let editingPerson = this.person.filter(i => i.editing == true );
+                    if (editingPerson.length > 0 ){
+                        if (editingPerson[0] != this.person[index]){
+                            this.message = 'wrong';
+                            return;
+                        }
+                    };
+                    if (this.person[index].editing == false){
+                        this.tempPerson = {...this.person[index]};
+                        this.person[index].editing = true;
+                        return;
+                    }
+                    else{
+                        if (this.emptyPerson.name == '' || this.emptyPerson.age == 0 ) {
+                            this.message = 'please fill correct information.' ;
+                            return;
+                        }
+                        this.person[index] = {...this.emptyPerson};
+                        let action = {
+                            action : 'edit',
+                            index : index,
+                            object : this.tempPerson,
+                        };
+                        this.record.push(action);
+                        this.person[index].editing = false;
+                        this.emptyPerson = {
+                            name : '',
+                            age : 0 ,
+                            gender : 'male',
+                            keysnumber : 0 ,
+                            editing : false,
+                        }
+                        this.tempPerson = {
+                            name : '',
+                            age : 0 ,
+                            gender : 'male',
+                            keysnumber : 0 ,
+                            editing : false,
+                        }
+                        this.message = 'update success.' ;
+                        return;
+                    };
+                },
+            },
+            // place initialization functions
+            mounted() {
+            },
+            // mount = install this structure in vue.
+        }).mount('#app');
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            box-sizing: border-box;
+        }
+        body{
+            width: 100vw;
+            height: 100vh;
+            margin: 0px;
+            padding: 0px;
+        }
+        nav{
+            width: 100%;
+            height: 30px;
+            color: white;
+            text-shadow: 0.1em 0.1em 0.2em gray;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: cornflowerblue;
+            font-size: 30px;
+        }
+        .pages{
+            width: 100%;
+            height: 30px;
+            color: white;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            background-color: lightblue;
+            font-size: 30px;
+        }
+        #postBody{
+            width: 100%;
+            height: calc(100vh - 30px);
+        }
+        .page{
+            width: auto;
+            height: 100%;
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid black;
+            font-size: 20px;
+            padding: 5px 10px;
+            margin: 0px 5px;
+        }
+        .post-zone{
+            width: 100%;
+            height: calc(100% - 30px);
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            background-color: blanchedalmond;
+            flex-wrap: wrap;
+        }
+        .post-block{
+            width: 300px;
+            height: auto;
+            border: 1px solid black;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            margin: 5px;
+        }
+        .block-title{
+            width: 100%;
+            height: 30px;
+            font-size: 30px;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            background-color:burlywood;
+            color: white;
+        }
+        .post-place{
+            height: calc(100% - 60px);
+        }
+        .post{
+            width: auto;
+            height: 60px;
+            background-color: lightyellow;
+            margin: 5px;
+            border: 1px solid black;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }.button-zone{
+            width: 100%;
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- nav bar -->
+    <nav>
+        Post-it!
+    </nav>
+
+    <!-- post zone -->
+    <div id="postBody">
+        <div class="pages">
+            <div v-for="(page,index) in pages":key="index" class="page">
+                <div>{{ page.state }}</div>
+            </div>
+            <button class="new-page" @click="newPage()">+</button>
+        </div>
+        <div class="post-zone">
+            <div v-for="(block,index) in postBlocks":key="index" class="post-block" >
+                <div class="block-title">{{block.state}}</div>
+                <div v-if="block.state == 'all'" class="post-place">
+                    <div v-for="(post,index) in postList ":key="index">
+                        <div class="post">
+                            {{ post.text }}
+                        </div>
+                    </div>
+                </div>
+                <div v-if="block.state != 'all'" class="post-place" @drop="onDrop($event, block.state)" @dragover.prevent @dragenter.prevent>
+                    <div v-for="(post,index) in postList":key="index" >
+                        <div v-if="post.state == block.state " 
+                        class="post" 
+                        draggable="true" 
+                        @dragstart="startDrag($event, post)">
+                            {{post.text}}
+                        </div>
+                    </div>
+                </div>
+                <div class="button-zone">
+                    <input v-model="block.newText" id="new-post-text" type="text" placeholder="請輸入文字">
+                    <button @click="newPost(block)" type="button">new post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- import vue -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- use vue -->
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data(){
+                return {
+                    pages : [
+                        {
+                            state : 'all',
+                        },
+                        {
+                            state : 'todo',
+                        },
+                    ],
+                    postBlocks : [
+                        {
+                            state : 'all',
+                            newText : '',
+                        },{
+                            state : 'todo',
+                            newText : '',
+                        },{
+                            state : 'done',
+                            newText : '',
+                        },
+                    ],
+                    postList : [
+                        {
+                            id : 0 ,
+                            text : 'try',
+                            state : 'todo',
+                        },
+                    ],
+                };
+            },
+            methods: {
+                newPage(){
+                    let newP = {
+                        state : 'new-page',
+                    };
+                    this.pages.push(newP);
+                    return;
+                },
+                newPost(block){
+                    console.log(block);
+                },
+                startDrag( e, item ){
+                    e.dataTransfer.dropEffect = 'move';
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('itemID', item.id);
+                },
+                onDrop( e , state ){
+                    const itemID = e.dataTransfer.getData('itemID');
+                    const item = this.postList.find((item) => item.id == itemID);
+                    item.state = state;
+                }
+            },
+
+            mounted() {
+
+            },
+        }).mount('#postBody');
+    </script>
+</body>
+</html>
