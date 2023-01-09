@@ -1,0 +1,27 @@
+[
+    {
+        "name": "微軟仿切",
+        "address": "./microsoft/microsoft.html",
+        "explanation": "123"
+    },
+    {
+        "name": "色弱測驗",
+        "address": "./color-weakness-test/cwt.html",
+        "explanation": "456"
+    },
+    {
+        "name": "便利貼試作(未完成)",
+        "address": "./vue/postIt.html",
+        "explanation": "789"
+    },
+    {
+        "name": "店家形象網站(未採用)",
+        "address": "https://11109-sy-timemachine.dev-hub.io/",
+        "explanation": "741"
+    },
+    {
+        "name": "API串接天氣小卡",
+        "address": "./weather-cards/fetch.html",
+        "explanation": "852"
+    }
+]
